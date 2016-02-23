@@ -12,7 +12,7 @@
                 <div class="post-heading">
                     <h1>{{ $post->title }}</h1>
                     <h2 class="subheading">{{ $post->sub_title }}</h2>
-                    <span class="meta">由 <a href="#">Start Bootstrap</a> 發表於 August 24, 2014</span>
+                    <span class="meta">發表於{{ $post->created_at->diffForHumans()}}</span>
                 </div>
             </div>
         </div>
@@ -26,8 +26,12 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
 
                 <div class="text-right" style="margin-bottom: 50px;">
-                    <a href="#" class="btn btn-primary" role="button">編輯</a>
-                    <a href="#" class="btn btn-danger" role="button">刪除</a>
+                    <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-primary" role="button">編輯</a>
+                    {!! Form::open(['route' => ['posts.destroy', $post->id], 'method' => 'DELETE', 
+                                    'style' => 'display: inline;']) !!}
+                    {!! Form::submit('刪除', ['class' => 'btn btn-primary', 'role' => 'button']) !!}
+                    {!! Form::close() !!}
+                    <!--<a href="#" class="btn btn-danger" role="button">刪除</a>-->
                 </div>
 
                 <div style="margin-bottom: 30px;">

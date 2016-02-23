@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use App\Http\Requests\PostRequest;
 use App\Http\Controllers\Controller;
 
 class PostsController extends Controller
@@ -16,7 +17,7 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $posts = \App\Post::orderBy('created_at', 'DESC')->get();
+        $posts = \App\Post::orderBy('created_at', 'DESC')->paginate(5);
         
         $data = compact('posts');
         //等同$data = ['posts' => $posts];直接將=>前後的名稱取為相同
@@ -40,9 +41,11 @@ class PostsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(PostRequest $request)
     {
-        //
+        $post = \App\Post::create($request->all());
+
+        return redirect()->route('posts.show', $post->id);
     }
 
     /**
@@ -54,6 +57,10 @@ class PostsController extends Controller
     public function show($id)
     {
         $post = \App\Post::find($id);
+
+        if (is_null($post)){
+            return redirect()->route('posts.index')->with('message', 'Not Found!');
+        }
 
         $data = compact('post');
 
@@ -68,7 +75,11 @@ class PostsController extends Controller
      */
     public function edit($id)
     {
-        //
+        $post = \App\Post::find($id);
+
+        $data = compact('post');
+
+        return view('posts.edit', $data);
     }
 
     /**
@@ -78,9 +89,13 @@ class PostsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(PostRequest $request, $id)
     {
-        //
+        $post = \App\Post::find($id);
+
+        $post->update($request->all());
+
+        return redirect()->route('posts.show', $post->id);
     }
 
     /**
@@ -91,20 +106,24 @@ class PostsController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $post = \App\Post::find($id);
+
+        $post->delete();
+
+        return redirect()->route('posts.index');
+
     }
     
     public function hot()
     {
-        $posts = \App\Post::orderBy('page_view', 'DESC')->get();
+        $posts = \App\Post::orderBy('page_view', 'DESC')->paginate(5);
         $data = compact('posts');
         return view('posts.hot', $data);
     }
 
     public function random()
     {
-        $id = rand(1, 20);
-        $post = \App\Post::find($id);
+        $post = \App\Post::all()->random();
         $data = compact('post');
         return view('posts.random', $data);
     }

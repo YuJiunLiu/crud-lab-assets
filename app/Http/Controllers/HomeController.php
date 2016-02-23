@@ -13,7 +13,7 @@ class HomeController extends Controller
     {
     	$posts = \App\Post::where('is_feature', 1)
     					 ->orderBy('created_at', 'DESC')
-    					 ->get();
+    					 ->paginate(5);
     	$data = ['posts' => $posts];				 
     	return view('home.index', $data);
     }
